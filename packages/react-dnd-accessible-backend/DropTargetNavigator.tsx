@@ -9,6 +9,8 @@ import type { DragDropActions, DragDropManager, DragDropMonitor } from "dnd-core
 enum NavigationKeys {
   UP = "ArrowUp",
   DOWN = "ArrowDown",
+  HOME = 'Home',
+  END = 'End',
   DROP = "Shift",
   CANCEL = "Escape",
 }
@@ -33,6 +35,7 @@ export class DropTargetNavigator {
     this.actions = manager.getActions();
     this.monitor = manager.getMonitor();
 
+    console.log('HERE')
     window.addEventListener("keydown", this.handleDraggedElementKeyDown, { capture: true });
   }
 
@@ -41,6 +44,7 @@ export class DropTargetNavigator {
   }
 
   handleDraggedElementKeyDown = (event: KeyboardEvent) => {
+    console.log(event.key)
     switch (event.key) {
       case NavigationKeys.UP:
         stopEvent(event);
@@ -51,7 +55,16 @@ export class DropTargetNavigator {
         stopEvent(event);
         this.hoverNode(this.getNextDropTarget());
         return;
+      case NavigationKeys.HOME:
+        stopEvent(event);
+        this.hoverNode(this.getFirstDropTarget());
+        return;
+      case NavigationKeys.END:
+        stopEvent(event);
+        this.hoverNode(this.getLastDropTarget());
+        return
     }
+
   };
 
   hoverNode(node: HTMLElement | null) {
@@ -79,6 +92,14 @@ export class DropTargetNavigator {
       wrap: false,
       from: this.currentHoveredNode ?? undefined,
     });
+  }
+
+  getFirstDropTarget() {
+    return this.focusManager.getFirstFocusableElement();
+  }
+
+  getLastDropTarget() {
+    return this.focusManager.getLastFocusableElement();
   }
 
   getViableTargets(nodes: Map<string, HTMLElement>) {
